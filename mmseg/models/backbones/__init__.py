@@ -9,6 +9,8 @@ from .resnext import ResNeXt
 from .unet import UNet
 
 from .mix_transformer import *
+# from .mix_transformer_adapter_auxclf import *
+# from .mix_transformer_adapter_auxclf_decodesc import *
 
 __all__ = [
     'ResNet', 'ResNetV1c', 'ResNetV1d', 'ResNeXt', 'HRNet', 'FastSCNN',

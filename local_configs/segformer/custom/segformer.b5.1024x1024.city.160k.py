@@ -9,11 +9,12 @@ _base_ = [
 norm_cfg = dict(type='BN', requires_grad=True)
 find_unused_parameters = True
 model = dict(
-    type='EncoderDecoder',
-    pretrained='pretrained/mit_b1.pth',
+    type='OthersEncoderDecoder',
+    pretrained='pretrained/mit_b5.pth',
     backbone=dict(
-        type='mit_b1',
-        style='pytorch'),
+        type='mit_b5',
+        style='pytorch',
+        aux_classifier=False),
     decode_head=dict(
         type='SegFormerHead',
         in_channels=[64, 128, 320, 512],
@@ -24,7 +25,7 @@ model = dict(
         num_classes=19,
         norm_cfg=norm_cfg,
         align_corners=False,
-        decoder_params=dict(embed_dim=256),
+        decoder_params=dict(embed_dim=768),
         loss_decode=dict(type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
     # model training and testing settings
     train_cfg=dict(),

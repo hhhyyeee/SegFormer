@@ -25,7 +25,9 @@ class EncoderDecoder(BaseSegmentor):
                  auxiliary_head=None,
                  train_cfg=None,
                  test_cfg=None,
-                 pretrained=None):
+                 pretrained=None,
+                 init_cfg=None,
+                 **cfg):
         super(EncoderDecoder, self).__init__()
         self.backbone = builder.build_backbone(backbone)
         if neck is not None:
@@ -65,6 +67,7 @@ class EncoderDecoder(BaseSegmentor):
         """
 
         super(EncoderDecoder, self).init_weights(pretrained)
+        # self.backbone.init_weights()
         self.backbone.init_weights(pretrained=pretrained)
         self.decode_head.init_weights()
         if self.with_auxiliary_head:
@@ -93,7 +96,7 @@ class EncoderDecoder(BaseSegmentor):
             align_corners=self.align_corners)
         return out
 
-    def _decode_head_forward_train(self, x, img_metas, gt_semantic_seg):
+    def _decode_head_forward_train(self, x, img_metas, gt_semantic_seg, seg_weight=None):
         """Run forward function and calculate loss for decode head in
         training."""
         losses = dict()

@@ -9,11 +9,12 @@ _base_ = [
 norm_cfg = dict(type='BN', requires_grad=True)
 find_unused_parameters = True
 model = dict(
-    type='EncoderDecoder',
+    type='OthersEncoderDecoder',
     pretrained='pretrained/mit_b1.pth',
     backbone=dict(
         type='mit_b1',
-        style='pytorch'),
+        style='pytorch',
+        aux_classifier=False),
     decode_head=dict(
         type='SegFormerHead',
         in_channels=[64, 128, 320, 512],

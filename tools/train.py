@@ -1,3 +1,7 @@
+import sys
+sys.path.append("/home/cvlab/workspace/hwpark/SegFormer")
+sys.path.append("/workspace/SegFormer")
+
 import argparse
 import copy
 import os
@@ -53,6 +57,7 @@ def parse_args():
         default='none',
         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
+    parser.add_argument('--wandb', type=int, default=0)
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -135,6 +140,27 @@ def main():
         test_cfg=cfg.get('test_cfg'))
 
     logger.info(model)
+
+    # wandb setting
+    if args.wandb:
+        BY_EPOCH = False
+        cfg["log_config"] = dict(
+            interval=1,
+            hooks=[
+                    dict(type="TextLoggerHook", by_epoch=BY_EPOCH),
+                    dict(
+                        type="WandbLoggerHook",
+                        by_epoch=BY_EPOCH,
+                        init_kwargs=dict(
+                            project="Hamlet-pretrain",
+                            name=f"{timestamp}-{meta['exp_name']}",
+                            config=cfg.copy(),
+                            # tags=tags,
+                            # notes=notes,
+                        ),
+                    ),
+            ]
+        )
 
     datasets = [build_dataset(cfg.data.train)]
 
