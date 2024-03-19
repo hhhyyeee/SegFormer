@@ -391,16 +391,16 @@ class MixVisionTransformer(BaseModule):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def init_weights(self):
+    def init_weights(self, pretrained=None):
         logger = get_root_logger()
-        if self.pretrained is None:
+        if pretrained is None:
             logger.info('Init mit from scratch.')
             for m in self.modules():
                 self._init_weights(m)
-        elif isinstance(self.pretrained, str):
+        elif isinstance(pretrained, str):
             logger.info('Load mit checkpoint.')
             checkpoint = _load_checkpoint(
-                self.pretrained, logger=logger, map_location='cpu')
+                pretrained, logger=logger, map_location='cpu')
             if 'state_dict' in checkpoint:
                 state_dict = checkpoint['state_dict']
             elif 'model' in checkpoint:
@@ -408,6 +408,24 @@ class MixVisionTransformer(BaseModule):
             else:
                 state_dict = checkpoint
             self.load_state_dict(state_dict, False)
+
+    # def init_weights(self):
+    #     logger = get_root_logger()
+    #     if self.pretrained is None:
+    #         logger.info('Init mit from scratch.')
+    #         for m in self.modules():
+    #             self._init_weights(m)
+    #     elif isinstance(self.pretrained, str):
+    #         logger.info('Load mit checkpoint.')
+    #         checkpoint = _load_checkpoint(
+    #             self.pretrained, logger=logger, map_location='cpu')
+    #         if 'state_dict' in checkpoint:
+    #             state_dict = checkpoint['state_dict']
+    #         elif 'model' in checkpoint:
+    #             state_dict = checkpoint['model']
+    #         else:
+    #             state_dict = checkpoint
+    #         self.load_state_dict(state_dict, False)
 
     def reset_drop_path(self, drop_path_rate):
         dpr = [

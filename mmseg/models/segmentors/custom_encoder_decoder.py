@@ -52,8 +52,8 @@ class OthersEncoderDecoder(EncoderDecoder):
         losses = dict()
         loss_decode = self.decode_head.forward_train(x, c, img_metas,
                                                      gt_semantic_seg,
-                                                     self.train_cfg,
-                                                     seg_weight)
+                                                     train_cfg=self.train_cfg,
+                                                     seg_weight=seg_weight)
 
         losses.update(add_prefix(loss_decode, 'decode'))
         return losses

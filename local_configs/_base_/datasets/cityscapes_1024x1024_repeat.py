@@ -18,6 +18,7 @@ train_pipeline = [
 ]
 test_pipeline = [
     dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations'),
     dict(
         type='MultiScaleFlipAug',
         img_scale=(2048, 1024),
@@ -28,7 +29,7 @@ test_pipeline = [
             dict(type='RandomFlip'),
             dict(type='Normalize', **img_norm_cfg),
             dict(type='ImageToTensor', keys=['img']),
-            dict(type='Collect', keys=['img']),
+            dict(type='Collect', keys=['img', 'gt_semantic_seg']),
         ])
 ]
 data = dict(
