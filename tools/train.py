@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/home/cvlab/workspace/hwpark/SegFormer")
+sys.path.append("/home/aix7703/hyewon/SegFormer")
 sys.path.append("/workspace/SegFormer")
 
 import argparse
