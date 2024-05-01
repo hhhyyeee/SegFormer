@@ -11,13 +11,12 @@ find_unused_parameters = True
 model = dict(
     type='OthersEncoderDecoder',
     pretrained='pretrained/segformer.b5.1024x1024.city.160k.replace.pth',
-    # pretrained='pretrained/mit_b5.pth',
     backbone=dict(
         type='mit_b5',
         style='pytorch',
         pet_cls="Adapter",
         adapt_blocks=[0, 1, 2, 3],
-        aux_classifier=True),
+        aux_classifier=False),
     decode_head=dict(
         type='SegFormerHead',
         in_channels=[64, 128, 320, 512],
@@ -43,13 +42,7 @@ checkpoint_config = dict(by_epoch=False, interval=4000)
 evaluation = dict(interval=500, metric='mIoU')
 
 # optimizer
-# optimizer = dict(_delete_=True, type='AdamW', lr=0.00006, betas=(0.9, 0.999), weight_decay=0.01,
-#                  paramwise_cfg=dict(custom_keys={'pos_block': dict(decay_mult=0.),
-#                                                  'norm': dict(decay_mult=0.),
-#                                                  'head': dict(lr_mult=10.)
-#                                                  }))
 optimizer = dict(_delete_=True, type='AdamW', lr=0.0002, betas=(0.9, 0.999), weight_decay=0.01)
-# optimizer = dict(_delete_=True, type='AdamW', lr=0.00006, betas=(0.9, 0.999), weight_decay=0.01)
 
 lr_config = dict(_delete_=True, policy='poly',
                  warmup='linear',

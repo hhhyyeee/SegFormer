@@ -13,11 +13,22 @@ model = dict(
     pretrained='pretrained/segformer.b5.1024x1024.city.160k.replace.pth',
     # pretrained='pretrained/mit_b5.pth',
     backbone=dict(
-        type='mit_b5',
+        type='mit_b5_evp',
         style='pytorch',
         pet_cls="Adapter",
         adapt_blocks=[0, 1, 2, 3],
-        aux_classifier=True),
+        aux_classifier=False,
+
+        scale_factor=4,
+        input_type="fft",
+        freq_nums=0.25,
+        prompt_type="highpass",
+        tuning_stage=1234,
+
+        handcrafted_tune=True,
+        embedding_tune=True,
+        conv_tune=True,
+        adaptor="adaptor"),
     decode_head=dict(
         type='SegFormerHead',
         in_channels=[64, 128, 320, 512],
