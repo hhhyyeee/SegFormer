@@ -108,12 +108,12 @@ class SimMIMEncoderDecoder(EncoderDecoder):
         # unravel batch dim
         seg_pred = list(seg_pred)
 
-        #!DEBUG
-        prob, pred = seg_logit.max(dim=1)
-        prob = [prob.cpu().numpy()]
-        pred = [pred.cpu().numpy()]
+        # #!DEBUG
+        # prob, pred = seg_logit.max(dim=1)
+        # prob = [prob.cpu().numpy()]
+        # pred = [pred.cpu().numpy()]
 
-        return seg_pred, prob, pred
+        return seg_pred #, prob, pred
 
 
     def extract_feat(self, img, mask=None):

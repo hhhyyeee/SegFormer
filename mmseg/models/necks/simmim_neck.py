@@ -79,7 +79,8 @@ class SimMIMSegFormerDecoder(BaseModule):
             in_channels=embedding_dim*4,
             out_channels=embedding_dim,
             kernel_size=1,
-            norm_cfg=dict(type='SyncBN', requires_grad=True)
+            norm_cfg=dict(type='BN', requires_grad=True)
+            # norm_cfg=dict(type='SyncBN', requires_grad=True)
         )
 
         encoder_stride = kwargs["encoder_stride"]
