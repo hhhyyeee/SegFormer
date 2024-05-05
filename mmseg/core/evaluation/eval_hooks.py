@@ -17,9 +17,12 @@ class EvalHook(Hook):
             raise TypeError('dataloader must be a pytorch DataLoader, but got '
                             f'{type(dataloader)}')
         self.dataloader = dataloader
+        if True: #!DEBUG
+            self.dataloader.dataset.img_infos = self.dataloader.dataset.img_infos[:10]
         self.interval = interval
         self.by_epoch = by_epoch
         self.eval_kwargs = eval_kwargs
+        self.out_dir = eval_kwargs.get("out_dir", None)
 
     def after_train_iter(self, runner):
         """After train epoch hook."""
@@ -27,7 +30,8 @@ class EvalHook(Hook):
             return
         from mmseg.apis import single_gpu_test
         runner.log_buffer.clear()
-        results = single_gpu_test(runner.model, self.dataloader, show=False)
+        results = single_gpu_test(runner.model, self.dataloader, out_dir=self.out_dir)
+        # results = single_gpu_test(runner.model, self.dataloader, show=False)
         self.evaluate(runner, results)
 
     def after_train_epoch(self, runner):
