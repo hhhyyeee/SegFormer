@@ -17,8 +17,8 @@ class EvalHook(Hook):
             raise TypeError('dataloader must be a pytorch DataLoader, but got '
                             f'{type(dataloader)}')
         self.dataloader = dataloader
-        if True: #!DEBUG
-            self.dataloader.dataset.img_infos = self.dataloader.dataset.img_infos[:10]
+        # if True: #!DEBUG
+        #     self.dataloader.dataset.img_infos = self.dataloader.dataset.img_infos[:10]
         self.interval = interval
         self.by_epoch = by_epoch
         self.eval_kwargs = eval_kwargs
