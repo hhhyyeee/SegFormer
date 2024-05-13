@@ -126,6 +126,33 @@ class SimMIMEncoderDecoder(EncoderDecoder):
 
     def forward_train(self, img, img_metas, gt_semantic_seg, seg_weight=None, return_feat=False):
 
+        a=1
+        losses = dict()
+
+        # mim
+        mask = self.mask_generator().to("cuda") #!DEBUG
+        # mask = torch.stack([data_sample.mask for data_sample in data_samples])
+        # img_latent = self.backbone(x, mask)
+        img_latent = self.extract_feat(img, mask)
+        img_rec = self.recon_neck(img_latent)
+        # img_rec = self.recon_neck(img_latent[0])
+        recon_loss = self.recon_head.loss(img_rec, img, mask)
+        losses.update({"recon_loss": recon_loss}) #!DEBUG
+
+        a=1
+
+        # segmentation
+        # x = self.extract_feat(img, mask)
+
+        if return_feat:
+            losses['features'] = img_latent
+        loss_decode = self._decode_head_forward_train(img_latent, img_metas, gt_semantic_seg)
+        losses.update(loss_decode)
+
+        return losses
+
+    def forward_train_orig(self, img, img_metas, gt_semantic_seg, seg_weight=None, return_feat=False):
+
         # segmentation
         a=1
         x = self.extract_feat(img)

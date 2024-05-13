@@ -134,6 +134,23 @@ class SimMIMMixVisionTransformer(MixVisionTransformerCVP):
 
 
 @BACKBONES.register_module()
+class mit_b4_cvp_simmim(SimMIMMixVisionTransformer):
+    def __init__(self, **kwargs):
+        super(mit_b4_cvp_simmim, self).__init__(
+            patch_size=4,
+            embed_dims=[64, 128, 320, 512],
+            num_heads=[1, 2, 5, 8],
+            mlp_ratios=[4, 4, 4, 4],
+            qkv_bias=True,
+            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            depths=[3, 8, 27, 3],
+            sr_ratios=[8, 4, 2, 1],
+            drop_rate=0.0,
+            drop_path_rate=0.1,
+            **kwargs)
+
+
+@BACKBONES.register_module()
 class mit_b5_cvp_simmim(SimMIMMixVisionTransformer):
     def __init__(self, **kwargs):
         super(mit_b5_cvp_simmim, self).__init__(
@@ -149,86 +166,4 @@ class mit_b5_cvp_simmim(SimMIMMixVisionTransformer):
             drop_path_rate=0.1,
             **kwargs)
 
-
-# @MODELS.register_module()
-# class SimMIM(BaseSelfSupervisor): #(BaseModel):
-#     """SimMIM.
-
-#     Implementation of `SimMIM: A Simple Framework for Masked Image Modeling
-#     <https://arxiv.org/abs/2111.09886>`_.
-#     """
-#     def __init__(self, **cfg):
-#                 #  backbone: dict,
-#                 #  neck: Optional[dict] = None,
-#                 #  head: Optional[dict] = None,
-#                 #  pretrained = None):
-#         a=1
-#         # super(SimMIM).__init__(cfg)
-#     #     self.backbone = backbone
-#     #     self.neck = neck
-#     #     self.head = head
-#     #     init_cfg = dict()
-#     #     if pretrained is not None:
-#     #         init_cfg = dict(type='Pretrained', checkpoint=pretrained)
-#     #     super().__init__(init_cfg=init_cfg)
-
-#     def forward(self,
-#                 inputs: Union[torch.Tensor, List[torch.Tensor]],
-#                 data_samples: Optional[List[DataSample]] = None, #noneed
-#                 mode: str = 'tensor'):
-#         """The unified entry for a forward process in both training and test.
-
-#         The method currently accepts two modes: "tensor" and "loss":
-
-#         - "tensor": Forward the backbone network and return the feature
-#           tensor(s) tensor without any post-processing, same as a common
-#           PyTorch Module.
-#         - "loss": Forward and return a dict of losses according to the given
-#           inputs and data samples.
-
-#         Args:
-#             inputs (torch.Tensor or List[torch.Tensor]): The input tensor with
-#                 shape (N, C, ...) in general.
-#             data_samples (List[DataSample], optional): The other data of
-#                 every samples. It's required for some algorithms
-#                 if ``mode="loss"``. Defaults to None.
-#             mode (str): Return what kind of value. Defaults to 'tensor'.
-
-#         Returns:
-#             The return type depends on ``mode``.
-
-#             - If ``mode="tensor"``, return a tensor or a tuple of tensor.
-#             - If ``mode="loss"``, return a dict of tensor.
-#         """
-#         if mode == 'tensor':
-#             feats = self.extract_feat(inputs)
-#             return feats
-#         elif mode == 'loss':
-#             return self.loss(inputs, data_samples)
-#         else:
-#             raise RuntimeError(f'Invalid mode "{mode}".')
-
-#     def extract_feat(self, inputs: torch.Tensor):
-#         return self.backbone(inputs, mask=None)
-
-#     def loss(self, inputs: torch.Tensor, data_samples: List[DataSample],
-#              **kwargs) -> Dict[str, torch.Tensor]:
-#         """The forward function in training.
-
-#         Args:
-#             inputs (List[torch.Tensor]): The input images.
-#             data_samples (List[DataSample]): All elements required
-#                 during the forward function.
-
-#         Returns:
-#             Dict[str, torch.Tensor]: A dictionary of loss components.
-#         """
-#         mask = torch.stack([data_sample.mask for data_sample in data_samples])
-
-#         img_latent = self.backbone(inputs, mask)
-#         img_rec = self.neck(img_latent[0])
-#         loss = self.head.loss(img_rec, inputs, mask)
-#         losses = dict(loss=loss)
-
-#         return losses
 
