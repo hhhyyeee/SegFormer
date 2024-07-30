@@ -12,6 +12,8 @@ from .mix_transformer import *
 # from .mix_transformer_adapter_auxclf import *
 # from .mix_transformer_adapter_auxclf_decodesc import *
 
+from .simmim import SimMIMMixVisionTransformer, mit_b5_cvp_simmim
+
 __all__ = [
     'ResNet', 'ResNetV1c', 'ResNetV1d', 'ResNeXt', 'HRNet', 'FastSCNN',
     'ResNeSt', 'MobileNetV2', 'UNet', 'CGNet', 'MobileNetV3',]
