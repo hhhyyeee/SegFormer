@@ -1,14 +1,14 @@
 # dataset settings
-dataset_type = 'CityscapesDataset'
-data_root = '/home/aix7703/cvlab/nfs_clientshare/datasets/cityscapes/'
-# data_root = '/data/datasets/cityscapes/'
+dataset_type = 'GTADataset'
+data_root = '/workspace/datasets/gta/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 crop_size = (1024, 1024)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
-    dict(type='Resize', img_scale=(2048, 1024), ratio_range=(0.5, 2.0)),
+    # dict(type='Resize', img_scale=(2048, 1024), ratio_range=(0.5, 2.0)),
+    dict(type='Resize', img_scale=(2560, 1440), ratio_range=(0.5, 2.0)), #https://www.ecva.net/papers/eccv_2022/papers_ECCV/papers/136900370.pdf
     dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.5),
     dict(type='PhotoMetricDistortion'),
@@ -33,26 +33,26 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=2,
-    workers_per_gpu=2,
+    samples_per_gpu=8,
+    workers_per_gpu=4,
     train=dict(
         type='RepeatDataset',
         times=500,
         dataset=dict(
             type=dataset_type,
             data_root=data_root,
-            img_dir='leftImg8bit/train',
-            ann_dir='gtFine/train',
+            img_dir='images',
+            ann_dir='labels',
             pipeline=train_pipeline)),
     val=dict(
-        type=dataset_type,
-        data_root=data_root,
+        type='CityscapesDataset',
+        data_root='/workspace/datasets/cityscapes/',
         img_dir='leftImg8bit/val',
         ann_dir='gtFine/val',
         pipeline=test_pipeline),
     test=dict(
-        type=dataset_type,
-        data_root=data_root,
+        type='CityscapesDataset',
+        data_root='/workspace/datasets/cityscapes/',
         img_dir='leftImg8bit/val',
         ann_dir='gtFine/val',
         pipeline=test_pipeline))
