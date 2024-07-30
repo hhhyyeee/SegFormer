@@ -6,16 +6,20 @@ _base_ = [
 ]
 
 # model settings
-norm_cfg = dict(type='SyncBN', requires_grad=True)
+norm_cfg = dict(type='BN', requires_grad=True)
 find_unused_parameters = True
 model = dict(
-    type='EncoderDecoder',
-    pretrained='pretrained/mit_b5.pth',
+    type='OthersEncoderDecoder',
+    pretrained='pretrained/mit_b1.pth',
     backbone=dict(
-        type='mit_b5',
-        style='pytorch'),
+        type='mit_b1',
+        style='pytorch',
+        pet_cls='Adapter',
+        adapt_blocks=[2, 3],
+        aux_classifier=True,
+        decoder_custom=True),
     decode_head=dict(
-        type='SegFormerHead',
+        type='DecodeSCSegFormerHead',
         in_channels=[64, 128, 320, 512],
         in_index=[0, 1, 2, 3],
         feature_strides=[4, 8, 16, 32],
@@ -24,7 +28,7 @@ model = dict(
         num_classes=19,
         norm_cfg=norm_cfg,
         align_corners=False,
-        decoder_params=dict(embed_dim=768),
+        decoder_params=dict(embed_dim=256, conv_kernel_size=1),
         loss_decode=dict(type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
     # model training and testing settings
     train_cfg=dict(),
@@ -32,9 +36,8 @@ model = dict(
     test_cfg=dict(mode='slide', crop_size=(1024,1024), stride=(768,768)))
 
 # data
-data = dict(samples_per_gpu=1)
-evaluation = dict(interval=1000, metric='mIoU')
-# evaluation = dict(interval=4000, metric='mIoU')
+data = dict(samples_per_gpu=4)
+evaluation = dict(interval=100, metric='mIoU')
 
 # optimizer
 optimizer = dict(_delete_=True, type='AdamW', lr=0.00006, betas=(0.9, 0.999), weight_decay=0.01,

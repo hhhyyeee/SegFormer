@@ -6,15 +6,14 @@ _base_ = [
 ]
 
 # model settings
-norm_cfg = dict(type='BN', requires_grad=True)
+norm_cfg = dict(type='SyncBN', requires_grad=True)
 find_unused_parameters = True
 model = dict(
-    type='OthersEncoderDecoder',
+    type='EncoderDecoder',
     pretrained='pretrained/mit_b5.pth',
     backbone=dict(
         type='mit_b5',
-        style='pytorch',
-        aux_classifier=False),
+        style='pytorch'),
     decode_head=dict(
         type='SegFormerHead',
         in_channels=[64, 128, 320, 512],
@@ -34,7 +33,8 @@ model = dict(
 
 # data
 data = dict(samples_per_gpu=1)
-evaluation = dict(interval=4000, metric='mIoU')
+evaluation = dict(interval=1000, metric='mIoU')
+# evaluation = dict(interval=4000, metric='mIoU')
 
 # optimizer
 optimizer = dict(_delete_=True, type='AdamW', lr=0.00006, betas=(0.9, 0.999), weight_decay=0.01,

@@ -5,9 +5,7 @@ from typing import List
 import torch.nn as nn
 
 
-# def freeze(module: nn.Module, *submodules: List[str]):
-def freeze(module: nn.Module, except_keywords: List[str]=["adapter", "stem", "injector",
-                                                          "local_embed", "prompt"]):
+def freeze(module: nn.Module, *submodules: List[str]):
     a=1
     for param in module.parameters():
         param.requires_grad_(False)
@@ -19,7 +17,7 @@ def freeze(module: nn.Module, except_keywords: List[str]=["adapter", "stem", "in
     #     param.requires_grad_(False)
     #     param.grad = None
     for name, param in module.named_parameters():
-        flags = [(x in name) for x in except_keywords]
+        flags = [(x in name) for x in ["adapter", "stem", "injector", "level_embed", "prompt"]]
         if sum(flags) == 0: continue
         # if "adapter" not in name: continue
         param.requires_grad_(True)

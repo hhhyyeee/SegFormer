@@ -19,6 +19,9 @@ from .psp_head import PSPHead
 from .sep_aspp_head import DepthwiseSeparableASPPHead
 from .sep_fcn_head import DepthwiseSeparableFCNHead
 from .uper_head import UPerHead
+from .decodesc_segformer_head import DecodeSCSegFormerHead
+
+from .simmim_head import SimMIMHead
 
 from .segformer_head import SegFormerHead
 from .simmim_head import SimMIMHead

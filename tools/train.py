@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/home/cvlab/workspace/hwpark/SegFormer")
+sys.path.append("/ssd_data1/hyewon/SegFormer")
 sys.path.append("/workspace/SegFormer")
 
 import argparse
@@ -58,8 +58,8 @@ def parse_args():
         default='none',
         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
-    parser.add_argument('--wandb', type=int, default=0)
-    parser.add_argument('--pid', type=int, default=0)
+    parser.add_argument('--wandb', type=int, default=1) #!DEBUG
+    parser.add_argument('--pid', type=int, default=1)
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -79,8 +79,8 @@ def main():
         torch.backends.cudnn.benchmark = True
 
     # determine project id
-    if args.pid == 0:
-        cfg.prj_dirname = f"project-{args.pid}"
+    # if args.pid == 0:
+    cfg.prj_dirname = f"project-{args.pid}"
     
     # determine train_serial
     timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
@@ -149,6 +149,7 @@ def main():
     logger.info(model)
 
     # wandb setting
+    args.wandb = 0 if DEBUG else args.wandb
     if args.wandb:
         BY_EPOCH = False
         cfg["log_config"] = dict(

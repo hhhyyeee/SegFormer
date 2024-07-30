@@ -126,7 +126,8 @@ class CityscapesDataset(CustomDataset):
                  metric='mIoU',
                  logger=None,
                  imgfile_prefix=None,
-                 efficient_test=False):
+                 efficient_test=False,
+                 **kwargs):
         """Evaluation in Cityscapes/default protocol.
 
         Args:

@@ -36,7 +36,8 @@ def single_gpu_test(model,
                     data_loader,
                     show=False,
                     out_dir=None,
-                    efficient_test=False):
+                    efficient_test=True,
+                    show_interval=10):
     """Test with single GPU.
 
     Args:
@@ -60,7 +61,7 @@ def single_gpu_test(model,
         with torch.no_grad():
             result = model(return_loss=False, **data)
 
-        if show or out_dir:
+        if (show or (out_dir is not None)) & ((i % show_interval) == 0):
             img_tensor = data['img'][0]
             img_metas = data['img_metas'][0].data[0]
             imgs = tensor2imgs(img_tensor, **img_metas[0]['img_norm_cfg'])

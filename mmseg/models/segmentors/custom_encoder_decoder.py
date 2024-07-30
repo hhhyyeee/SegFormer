@@ -1,5 +1,13 @@
+from collections import OrderedDict
 from mmseg.core import add_prefix
 from mmseg.ops import resize
+from mmseg.models.utils import freeze
+from mmseg.utils import get_root_logger
+from tools.get_param_count import count_parameters
+
+import torch
+import torch.nn as nn
+from mmcv.runner import BaseModule, _load_checkpoint
 
 from ..builder import SEGMENTORS
 from .encoder_decoder import EncoderDecoder
@@ -32,10 +40,48 @@ class OthersEncoderDecoder(EncoderDecoder):
         a=1
         num_module = 4
         self.decodesc_flag = "decoder_custom" in backbone
+
+        self.freeze_backbone = cfg.get("freeze_backbone", None)
+        self.freeze_decode_head = cfg.get("freeze_decode_head", None)
+        if (self.freeze_backbone is not None) and (self.freeze_backbone == True):
+            freeze(self.backbone)
+        if (self.freeze_decode_head is not None) and (self.freeze_decode_head == True):
+            freeze(self.decode_head)
+        count_parameters(self.backbone)
+        count_parameters(self.decode_head)
+        a=1
     
     def get_main_model(self):
         return self.main_model
-    
+
+    def init_weights(self, pretrained=None):
+        """Initialize the weights in backbone and heads.
+
+        Args:
+            pretrained (str, optional): Path to pre-trained weights.
+                Defaults to None.
+        """
+
+        super(EncoderDecoder, self).init_weights(pretrained)
+        logger = get_root_logger()
+        state_dict = _load_checkpoint(pretrained, logger=logger, map_location="cpu")
+        backbone_state_dict = OrderedDict({k.replace("backbone.", ""): v for k, v in state_dict["state_dict"].items() if "backbone" in k})
+        decode_head_state_dict = OrderedDict({k.replace("decode_head.", ""): v for k, v in state_dict["state_dict"].items() if "decode_head" in k})
+        a=1
+
+        # self.backbone.init_weights()
+        self.backbone.load_state_dict(backbone_state_dict, False)
+        self.decode_head.load_state_dict(decode_head_state_dict, False)
+        # self.backbone.init_weights(pretrained=pretrained)
+        # self.decode_head.init_weights()
+
+        if self.with_auxiliary_head:
+            if isinstance(self.auxiliary_head, nn.ModuleList):
+                for aux_head in self.auxiliary_head:
+                    aux_head.init_weights()
+            else:
+                self.auxiliary_head.init_weights()
+
     def extract_feat_decodesc(self, img):
         a=1
         x, c = self.backbone(img)
@@ -52,8 +98,8 @@ class OthersEncoderDecoder(EncoderDecoder):
         losses = dict()
         loss_decode = self.decode_head.forward_train(x, c, img_metas,
                                                      gt_semantic_seg,
-                                                     self.train_cfg,
-                                                     seg_weight)
+                                                     train_cfg=self.train_cfg,
+                                                     seg_weight=seg_weight)
 
         losses.update(add_prefix(loss_decode, 'decode'))
         return losses
