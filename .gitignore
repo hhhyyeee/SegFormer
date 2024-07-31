@@ -121,5 +121,6 @@ trash/
 trash
 
 
+tmp/
 wandb/
 work_dirs/

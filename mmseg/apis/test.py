@@ -27,6 +27,7 @@ def np2tmp(array, temp_file_name=None):
 
     if temp_file_name is None:
         temp_file_name = tempfile.NamedTemporaryFile(
+            dir='/workspace/SegFormer/tmp/', #!DEBUG
             suffix='.npy', delete=False).name
     np.save(temp_file_name, array)
     return temp_file_name

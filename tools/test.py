@@ -1,3 +1,6 @@
+import sys
+sys.path.append('/workspace/SegFormer')
+
 import argparse
 import os
 

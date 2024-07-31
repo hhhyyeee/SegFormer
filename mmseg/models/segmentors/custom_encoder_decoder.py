@@ -63,6 +63,7 @@ class OthersEncoderDecoder(EncoderDecoder):
         """
 
         super(EncoderDecoder, self).init_weights(pretrained)
+        if pretrained is None: return
         logger = get_root_logger()
         state_dict = _load_checkpoint(pretrained, logger=logger, map_location="cpu")
         backbone_state_dict = OrderedDict({k.replace("backbone.", ""): v for k, v in state_dict["state_dict"].items() if "backbone" in k})
@@ -71,9 +72,9 @@ class OthersEncoderDecoder(EncoderDecoder):
 
         # self.backbone.init_weights()
         self.backbone.load_state_dict(backbone_state_dict, False)
-        self.decode_head.load_state_dict(decode_head_state_dict, False)
+        # self.decode_head.load_state_dict(decode_head_state_dict, True)
         # self.backbone.init_weights(pretrained=pretrained)
-        # self.decode_head.init_weights()
+        self.decode_head.init_weights()
 
         if self.with_auxiliary_head:
             if isinstance(self.auxiliary_head, nn.ModuleList):

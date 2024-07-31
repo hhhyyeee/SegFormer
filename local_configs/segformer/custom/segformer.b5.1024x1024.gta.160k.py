@@ -11,10 +11,10 @@ _base_ = [
 norm_cfg = dict(type='BN', requires_grad=True)
 find_unused_parameters = True
 model = dict(
-    type='SimMIMEncoderDecoder',
+    type='OthersEncoderDecoder',
     pretrained='pretrained/mit_b5.pth',
     backbone=dict(
-        type='mit_b5_cvp_simmim',
+        type='mit_b5_cvp',
         style='pytorch',
         img_size=1024,
 
@@ -47,32 +47,30 @@ model = dict(
         align_corners=False,
         decoder_params=dict(embed_dim=768),
         loss_decode=dict(type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
-    recon_neck=dict(
-        type='SimMIMSegFormerDecoder',
-        in_channels=[64, 128, 320, 512],
-        in_index=[0, 1, 2, 3],
-        feature_strides=[4, 8, 16, 32],
+    # recon_neck=dict(
+    #     type='SimMIMSegFormerDecoder',
+    #     in_channels=[64, 128, 320, 512],
+    #     in_index=[0, 1, 2, 3],
+    #     feature_strides=[4, 8, 16, 32],
 
-        # type='SimMIMLinearDecoder',
-        # in_channels=128 * 2**3,
-        decoder_params=dict(embed_dim=768),
-        encoder_stride=4 #32
-    ),
-    recon_head=dict(
-        type='SimMIMHead',
-        patch_size=4,
-        loss=dict(type='PixelReconstructionLoss', criterion='L1', channel=3)
-    ),
+    #     # type='SimMIMLinearDecoder',
+    #     # in_channels=128 * 2**3,
+    #     decoder_params=dict(embed_dim=768),
+    #     encoder_stride=4 #32
+    # ),
+    # recon_head=dict(
+    #     type='SimMIMHead',
+    #     patch_size=4,
+    #     loss=dict(type='PixelReconstructionLoss', criterion='L1', channel=3)
+    # ),
     # model training and testing settings
     train_cfg=dict(),
     # test_cfg=dict(mode='whole'),
-    test_cfg=dict(mode='slide', crop_size=(1024,1024), stride=(768,768)),
-    mask_cfg = dict(mask_ratio=0.3, test_input_size=(1024, 1024)))
+    test_cfg=dict(mode='slide', crop_size=(1024,1024), stride=(768,768)))
 
 # data
 data = dict(samples_per_gpu=2)
-evaluation = dict(interval=1, metric='mIoU')
-# evaluation = dict(interval=1000, metric='mIoU')
+evaluation = dict(interval=1000, metric='mIoU')
 # evaluation = dict(interval=4000, metric='mIoU')
 
 # optimizer

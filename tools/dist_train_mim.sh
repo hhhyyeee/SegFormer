@@ -7,7 +7,8 @@ PORT=${PORT:-29507}
 #DEBUG
 PYTHONPATH="$(dirname $0)/..":$PYTHONPATH \
 python -m torch.distributed.launch --nproc_per_node=$GPUS --master_port=$PORT \
-    $(dirname "$0")/train_mim.py $CONFIG --wandb 1 --pid 5 --work-dir ./work_dirs/project-5/20240730_180500/ --launcher pytorch ${@:3}
+    $(dirname "$0")/train_mim.py $CONFIG --wandb 1 --pid 5 --work-dir ./work_dirs/project-5/20240731_114000/ \
+    --load-from ./work_dirs/project-5/20240730_162632/iter_32000.pth --launcher pytorch ${@:3}
 
 # # experiment
 # PYTHONPATH="$(dirname $0)/..":$PYTHONPATH \
