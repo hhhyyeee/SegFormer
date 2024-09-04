@@ -456,6 +456,7 @@ class MixVisionTransformerCVP(nn.Module):
     def init_weights(self, pretrained=None):
         if isinstance(pretrained, str):
             logger = get_root_logger()
+            # load_checkpoint(self, pretrained, map_location='cpu', strict=True, logger=logger) #!DEBUG
             load_checkpoint(self, pretrained, map_location='cpu', strict=False, logger=logger)
 
     def reset_drop_path(self, drop_path_rate):

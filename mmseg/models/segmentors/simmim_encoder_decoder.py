@@ -72,6 +72,10 @@ class SimMIMEncoderDecoder(EncoderDecoder):
         test_cfg=None,
         pretrained=None,
         mask_cfg=None,
+<<<<<<< HEAD
+=======
+        mim_cfg=None,
+>>>>>>> db578346e457b0fe9b461f6eeefc6e8cbb6c972e
         init_cfg=None,
         **cfg
         ):
@@ -90,13 +94,15 @@ class SimMIMEncoderDecoder(EncoderDecoder):
         self.recon_head = builder.build_head(cfg["recon_head"])
 
         self.mask_generator = MaskGenerator(
-            input_size=backbone["img_size"], #720,
+            # input_size=backbone["img_size"], #720,
+            input_size=mask_cfg['test_input_size'],
             mask_patch_size=32,
             model_patch_size=4,
             mask_ratio=mask_cfg["mask_ratio"])
 
         self.test_mask_generator = MaskGenerator(
-            input_size=mask_cfg["test_input_size"],
+            # input_size=(1024, 2048),
+            input_size=mask_cfg['test_input_size'],
             mask_patch_size=32,
             model_patch_size=4,
             mask_ratio=mask_cfg["mask_ratio"])
@@ -216,7 +222,7 @@ class SimMIMEncoderDecoder(EncoderDecoder):
         return losses
 
     @staticmethod
-    def _parse_losses(losses):
+    def _parse_losses(losses, **kwargs):
         """Parse the raw outputs (losses) of the network.
 
         Args:
@@ -239,9 +245,13 @@ class SimMIMEncoderDecoder(EncoderDecoder):
                 raise TypeError(
                     f'{loss_name} is not a tensor or list of tensors')
 
-        loss = sum(_value for _key, _value in log_vars.items()
-                   if 'loss' in _key)
-        # loss = 2 * log_vars["recon_loss"] + log_vars["decode.loss_seg"]
+        if kwargs.get("mode", "") == "recon_first":
+            _log_vars = {k: v for k, v in log_vars.items() if "recon" in k}
+            loss = sum(_value for _key, _value in _log_vars.items()
+                       if 'loss' in _key)
+        else:
+            loss = sum(_value for _key, _value in log_vars.items()
+                       if 'loss' in _key)
 
         log_vars['loss'] = loss
         for loss_name, loss_value in log_vars.items():
@@ -253,4 +263,18 @@ class SimMIMEncoderDecoder(EncoderDecoder):
 
         return loss, log_vars
 
+
+    def train_step(self, data_batch, optimizer, **kwargs):
+        losses = self(**data_batch)
+        if kwargs.get('iter', np.inf) < -1: #!DEBUG
+            loss, log_vars = self._parse_losses(losses, mode="recon_first")
+        else:
+            loss, log_vars = self._parse_losses(losses)
+
+        outputs = dict(
+            loss=loss,
+            log_vars=log_vars,
+            num_samples=len(data_batch['img'].data))
+
+        return outputs
 

@@ -123,4 +123,6 @@ trash
 .gitignore
 mmpretrain/
 notebooks/
+tmp/
 wandb/
+work_dirs/

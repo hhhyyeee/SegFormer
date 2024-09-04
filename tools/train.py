@@ -1,5 +1,4 @@
 import sys
-sys.path.append("/ssd_data1/hyewon/SegFormer")
 sys.path.append("/workspace/SegFormer")
 
 import argparse
@@ -148,12 +147,16 @@ def main():
 
     logger.info(model)
 
+    # eval config
+    if getattr(cfg, "evaluation"):
+        cfg.evaluation.update(dict(out_dir=cfg.work_dir))
+
     # wandb setting
     args.wandb = 0 if DEBUG else args.wandb
     if args.wandb:
         BY_EPOCH = False
         cfg["log_config"] = dict(
-            interval=1,
+            interval=100,
             hooks=[
                     dict(type="TextLoggerHook", by_epoch=BY_EPOCH),
                     dict(
