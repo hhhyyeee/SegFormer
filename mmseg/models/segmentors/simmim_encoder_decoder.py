@@ -71,7 +71,7 @@ class SimMIMEncoderDecoder(EncoderDecoder):
         train_cfg=None,
         test_cfg=None,
         pretrained=None,
-        mim_cfg=None,
+        mask_cfg=None,
         init_cfg=None,
         **cfg
         ):
@@ -93,15 +93,16 @@ class SimMIMEncoderDecoder(EncoderDecoder):
             input_size=backbone["img_size"], #720,
             mask_patch_size=32,
             model_patch_size=4,
-            mask_ratio=0.6)
+            mask_ratio=mask_cfg["mask_ratio"])
 
-        a=1
         self.test_mask_generator = MaskGenerator(
-            input_size=(1024, 2048),
+            input_size=mask_cfg["test_input_size"],
             mask_patch_size=32,
             model_patch_size=4,
-            mask_ratio=0.6
-        )
+            mask_ratio=mask_cfg["mask_ratio"])
+
+        self.misc = dict()
+
 
     def forward(self, img, img_metas, return_loss=True, **kwargs):
         # simmim
@@ -128,7 +129,7 @@ class SimMIMEncoderDecoder(EncoderDecoder):
         seg_pred = list(seg_pred)
 
         a=1
-        rec_pred = self.reconstruct(img)
+        # rec_pred = self.reconstruct(img) #!DEBUG
 
         # #!DEBUG
         # prob, pred = seg_logit.max(dim=1)
@@ -172,9 +173,15 @@ class SimMIMEncoderDecoder(EncoderDecoder):
         img_rec = self.recon_neck(img_latent)
         # img_rec = self.recon_neck(img_latent[0])
         recon_loss = self.recon_head.loss(img_rec, img, mask)
+        # recon_loss = self.recon_head.loss(img_rec, img, mask=None) #!DEBUG
         losses.update({"recon_loss": recon_loss}) #!DEBUG
 
-        a=1
+        if True: #!DEBUG
+            a=1
+            self.misc.update({
+                "img_rec": img_rec.detach().cpu(),
+                "img_metas": img_metas})
+
 
         # segmentation
         # x = self.extract_feat(img, mask)
@@ -189,7 +196,6 @@ class SimMIMEncoderDecoder(EncoderDecoder):
     def forward_train_orig(self, img, img_metas, gt_semantic_seg, seg_weight=None, return_feat=False):
 
         # segmentation
-        a=1
         x = self.extract_feat(img)
 
         losses = dict()
@@ -198,14 +204,14 @@ class SimMIMEncoderDecoder(EncoderDecoder):
         loss_decode = self._decode_head_forward_train(x, img_metas, gt_semantic_seg)
         losses.update(loss_decode)
 
-        mask = self.mask_generator().to("cuda") #!DEBUG
-        # mask = torch.stack([data_sample.mask for data_sample in data_samples])
-        # img_latent = self.backbone(x, mask)
+        mask = self.mask_generator().to("cuda")
+
         img_latent = self.extract_feat(img, mask)
         img_rec = self.recon_neck(img_latent)
-        # img_rec = self.recon_neck(img_latent[0])
+
         recon_loss = self.recon_head.loss(img_rec, img, mask)
-        losses.update({"recon_loss": recon_loss}) #!DEBUG
+        # recon_loss = self.recon_head.loss(img_rec, img, mask=None) #!DEBUG
+        losses.update({"recon_loss": recon_loss})
 
         return losses
 

@@ -86,6 +86,38 @@ def single_gpu_test(model,
                     show=show,
                     out_file=out_file)
 
+            a=1
+            #!DEBUG (visualize reconstructed images)
+            recons = model.module.misc.get('img_rec', None)
+            if (show or out_dir) and (i % show_interval == 0) and (recons is not None):
+
+                img_metas = data['img_metas'][0].data[0]
+                recons = tensor2imgs(recons, **img_metas[0]['img_norm_cfg'])
+
+                for recon, img_meta in zip(recons, img_metas):
+
+                    h, w, _ = img_meta['img_shape']
+                    recon_show = recon[:h, :w, :]
+
+                    ori_h, ori_w = img_meta['ori_shape'][:-1]
+                    recon_show = mmcv.imresize(recon_show, (ori_w, ori_h))
+
+                    if out_dir:
+                        img_filename = img_meta['ori_filename'].replace('.png', '.recon.png')
+                        out_file = osp.join(out_dir, img_filename)
+                    else:
+                        out_file = None
+                    a=1
+
+                    mmcv.imwrite(recon_show, out_file)
+                    # # ema model output
+                    # model.module.show_result(
+                    #     recon_show,
+                    #     result,
+                    #     palette=dataset.PALETTE,
+                    #     show=show,
+                    #     out_file=out_file)
+
         if isinstance(result, list):
             if efficient_test:
                 result = [np2tmp(_) for _ in result]
