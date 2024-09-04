@@ -1,6 +1,5 @@
 import sys
 sys.path.append("/ssd_data1/hyewon/SegFormer")
-sys.path.append("/workspace/SegFormer")
 
 import argparse
 import copy

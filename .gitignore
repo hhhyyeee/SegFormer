@@ -120,5 +120,7 @@ pretrained/
 trash/
 trash
 
-
+.gitignore
+mmpretrain/
+notebooks/
 wandb/
